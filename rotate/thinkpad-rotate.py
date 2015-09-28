@@ -5,13 +5,13 @@ thinkpad-rotate.py
 Rotates any detected screen, wacom digitizers, touchscreens,
 touchpad/trackpoint based on orientation gathered from accelerometer. 
 
-Tested with Lenovo Thinkpad Yoga S1
-
-https://github.com/admiralakber/thinkpad-yoga-scripts
+Tested with Lenovo Thinkpad Yoga 12
 
 Acknowledgements:
 Modified from source:
 https://gist.githubusercontent.com/ei-grad/4d9d23b1463a99d24a8d/raw/rotate.py
+Forked from:
+https://github.com/admiralakber/thinkpad-yoga-scripts
 
 """
 
@@ -63,30 +63,38 @@ scale = float(read('in_accel_scale'))
 g = 7.0  # (m^2 / s) sensibility, gravity trigger
 
 STATES = [
-    {'rot': 'normal', 'pen': 'none', 'coord': '1 0 0 0 1 0 0 0 1', 'touchpad': 'enable',
-     'check': lambda x, y: y <= -g},
-    {'rot': 'inverted', 'pen': 'half', 'coord': '-1 0 1 0 -1 1 0 0 1', 'touchpad': 'disable',
-     'check': lambda x, y: y >= g},
-    {'rot': 'left', 'pen': 'ccw', 'coord': '0 -1 1 1 0 0 0 0 1', 'touchpad': 'disable',
-     'check': lambda x, y: x >= g},
-    {'rot': 'right', 'pen': 'cw', 'coord': '0 1 0 -1 0 1 0 0 1', 'touchpad': 'disable',
-     'check': lambda x, y: x <= -g},
+    {'rot': 'normal', 'pen': 'none', 'coord': '1 0 0 0 1 0 0 0 1', 'touchpad': 'enable', 'check': lambda x, y: y <= -g},
+    {'rot': 'inverted', 'pen': 'half', 'coord': '-1 0 1 0 -1 1 0 0 1', 'touchpad': 'disable', 'check': lambda x, y: y >= g},
+    {'rot': 'left', 'pen': 'ccw', 'coord': '0 -1 1 1 0 0 0 0 1', 'touchpad': 'disable', 'check': lambda x, y: x >= g},
+    {'rot': 'right', 'pen': 'cw', 'coord': '0 1 0 -1 0 1 0 0 1', 'touchpad': 'disable', 'check': lambda x, y: x <= -g},
 ]
 
+print touchscreens
 
 def rotate(state):
     s = STATES[state]
-    check_call(['xrandr', '-o', s['rot']],env=env)
+    try:
+    	check_call(['xrandr', '-o', s['rot']],env=env)
+    except:
+	e = sys.exc_info()
+	print e
+	sleep(2)
+	rotate(state)
+	pass
     for dev in touchscreens if disable_touchpads else (touchscreens + touchpads):
-        check_call([
-            'xinput', 'set-prop', dev,
-            'Coordinate Transformation Matrix',
-        ] + s['coord'].split(),env=env)
+
+	try:
+		check_call(['xinput', 'set-prop', dev, 'Coordinate Transformation Matrix',] + s['coord'].split(),env=env)
+	except:
+		e = sys.exc_info()
+		print e
+		sleep(2)
+		rotate(state)
+		pass
+
     if rotate_pens:
         for dev in wacoms:
-            check_call([
-                'xsetwacom','set', dev,
-                'rotate',s['pen']],env=env)
+            check_call(['xsetwacom','set', dev, 'rotate',s['pen']],env=env)
     if disable_touchpads:
         for dev in touchpads:
             check_call(['xinput', s['touchpad'], dev],env=env)
@@ -112,5 +120,6 @@ if __name__ == '__main__':
             if STATES[i]['check'](x, y):
                 current_state = i
                 rotate(i)
+		print current_state
                 break
         sleep(1)
