@@ -69,8 +69,6 @@ STATES = [
     {'rot': 'right', 'pen': 'cw', 'coord': '0 1 0 -1 0 1 0 0 1', 'touchpad': 'disable', 'check': lambda x, y: x <= -g},
 ]
 
-print touchscreens
-
 def rotate(state):
     s = STATES[state]
     try:
@@ -120,6 +118,5 @@ if __name__ == '__main__':
             if STATES[i]['check'](x, y):
                 current_state = i
                 rotate(i)
-		print current_state
                 break
         sleep(1)
