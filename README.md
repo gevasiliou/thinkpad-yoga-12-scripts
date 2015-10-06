@@ -22,7 +22,7 @@ Tested on Fedora 22 KDE.
 
 # Usage/Customization:
 
-Assuming installed as per the PKGBUILD
+Assuming installed as per the rpm package.
 
 Depending whether or not your DE rotates the Wacom orientation with
 the screen automatically edit the following file accordingly:
@@ -51,17 +51,3 @@ to edit the systemd modules. Likewise if your tablets display is not
 - gawk
 - xsetwacom (optional for wacom rotation)
 - onboard (optional for onscreen keyboard)
-
-# Manual installation
-
-    sudo -s
-    git clone https://github.com/admiralakber/thinkpad-yoga-scripts /opt/thinkpad-yoga-scripts
-    cp /opt/thinkpad-yoga-scripts/systemd/* /usr/lib/systemd/system/
-
-On Ubuntu 15.04, you may need to create the above directory.
-
-    systemctl start wacom-proximity@username.service
-    systemctl start yoga-rotate@username.service
-    systemctl start yoga-tablet.service
-    systemctl start yoga-backlight.service
-    
